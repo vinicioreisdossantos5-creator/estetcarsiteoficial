@@ -1,1 +1,931 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>EstetCar Auto Center</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --blue:#0066FF;--blue-d:#0055dd;--blue-glow:rgba(0,102,255,0.28);
+  --bg:#000;--s1:#0a0a0a;--s2:#111;--bd:#1e1e1e;--mt:#888;--mt2:#444;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#fff;overflow-x:hidden}
+#particles{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;pointer-events:none;opacity:.45}
+.app{position:relative;z-index:1;min-height:100vh}
 
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(0,0,0,.85);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd)}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.nav-logo img{height:34px;object-fit:contain}
+.nav-logo span{font-size:15px;font-weight:700;color:#fff}
+.nav-links{display:flex;gap:4px}
+.nav-btn{background:none;border:none;color:var(--mt);font-size:13px;font-weight:500;padding:7px 13px;border-radius:50px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nav-btn:hover,.nav-btn.active{color:#fff;background:var(--s2)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
+.hamburger span{width:22px;height:2px;background:#fff;border-radius:2px;transition:all .3s;display:block}
+.mob-menu{display:none;position:fixed;top:60px;left:0;right:0;z-index:999;background:rgba(4,4,4,.97);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding:12px;flex-direction:column;gap:4px}
+.mob-menu.open{display:flex}
+.mob-btn{background:none;border:none;color:var(--mt);font-size:15px;padding:13px 16px;border-radius:10px;cursor:pointer;text-align:left;transition:all .2s;width:100%}
+.mob-btn:hover{color:#fff;background:var(--s2)}
+
+/* ── PAGES ── */
+.page{display:none;padding-top:60px;min-height:100vh}
+.page.active{display:block;animation:fadeUp .3s ease}
+#home-page{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:72px 20px 60px;min-height:100vh}
+#home-page.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HOME ── */
+.hero-search{width:100%;max-width:460px;position:relative;margin-bottom:40px}
+.hero-search input{width:100%;padding:15px 52px 15px 22px;background:rgba(255,255,255,.06);border:1.5px solid var(--bd);border-radius:50px;color:#fff;font-size:15px;outline:none;transition:all .3s;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hero-search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+.hero-search input::placeholder{color:var(--mt2)}
+.srch-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;background:var(--blue);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .2s}
+.srch-btn:hover{background:var(--blue-d)}
+.srch-btn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+#heroDrop{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#0d0d0d;border:1px solid var(--bd);border-radius:16px;overflow:hidden;z-index:999;box-shadow:0 12px 40px rgba(0,0,0,.8);max-height:300px;overflow-y:auto}
+.drop-item{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;cursor:pointer;border-bottom:1px solid #141414;transition:background .15s}
+.drop-item:hover{background:#141414}
+.drop-item:last-child{border-bottom:none}
+.drop-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.drop-body{flex:1;min-width:0}
+.drop-meta{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}
+.drop-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
+.drop-badge.svc{background:rgba(0,102,255,.15);color:#4d9fff}
+.drop-badge.prd{background:rgba(0,180,80,.12);color:#00cc66}
+.drop-price{color:var(--blue);font-size:12px;font-weight:700}
+.drop-title{font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drop-desc{font-size:12px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-logo{width:150px;max-width:60%;margin-bottom:18px;filter:drop-shadow(0 0 18px var(--blue-glow))}
+.hero-title{font-size:clamp(26px,8vw,52px);font-weight:800;line-height:1.1;margin-bottom:12px;letter-spacing:-1px}
+.hero-title .hl{color:var(--blue)}
+.hero-sub{color:var(--mt);font-size:clamp(14px,4vw,17px);margin-bottom:36px;max-width:340px;line-height:1.6}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:52px}
+.btn-pri{background:var(--blue);color:#fff;border:none;padding:14px 28px;border-radius:50px;font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;box-shadow:0 4px 18px var(--blue-glow)}
+.btn-pri:hover{background:var(--blue-d);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:#fff;border:1.5px solid var(--bd);padding:14px 28px;border-radius:50px;font-size:15px;font-weight:600;cursor:pointer;transition:all .25s}
+.btn-ghost:hover{border-color:#fff;transform:translateY(-2px)}
+.stats{display:flex;gap:36px;justify-content:center;flex-wrap:wrap}
+.stat-num{font-size:clamp(20px,5vw,34px);font-weight:800;color:var(--blue)}
+.stat-lbl{font-size:11px;color:var(--mt);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
+
+/* ── SHARED SECTION LAYOUT ── */
+.sec-wrap{max-width:900px;margin:0 auto;padding:0 20px 80px}
+.sec-hero{max-width:900px;margin:0 auto;padding:36px 20px 28px;text-align:center}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase;padding:5px 14px;border:1px solid rgba(0,102,255,.3);border-radius:50px;margin-bottom:14px}
+.sec-title{font-size:clamp(22px,6vw,42px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:10px}
+.sec-sub{color:var(--mt);font-size:15px;max-width:500px;margin:0 auto;line-height:1.6}
+.back-btn{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--bd);color:var(--mt);padding:9px 18px;border-radius:50px;font-size:13px;cursor:pointer;transition:all .2s;margin:20px}
+.back-btn:hover{border-color:#fff;color:#fff}
+.divider-label{display:flex;align-items:center;gap:12px;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--mt);text-transform:uppercase;margin:28px 0 18px}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* ── SERVICES ── */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.svc-card{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:26px 22px;transition:all .3s;position:relative;overflow:hidden}
+.svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:opacity .3s}
+.svc-card:hover{border-color:rgba(0,102,255,.4);transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,102,255,.1)}
+.svc-card:hover::before{opacity:1}
+.svc-icon{font-size:30px;margin-bottom:14px}
+.svc-card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.svc-card p{font-size:13px;color:var(--mt);line-height:1.6;margin-bottom:18px}
+.svc-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(0,102,255,.1);color:var(--blue);border:1px solid rgba(0,102,255,.25);border-radius:50px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s}
+.svc-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── PRODUCTS ── */
+.prod-search{position:relative;max-width:500px;margin:0 auto 28px}
+.prod-search input{width:100%;padding:13px 48px 13px 20px;background:var(--s1);border:1.5px solid var(--bd);border-radius:50px;color:#fff;font-size:14px;outline:none;transition:all .3s}
+.prod-search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+.prod-search input::placeholder{color:var(--mt2)}
+.prod-srch-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;background:var(--blue);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.prod-srch-btn svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.prod-card{background:var(--s1);border:1px solid var(--bd);border-radius:18px;overflow:hidden;cursor:pointer;transition:all .3s;-webkit-user-select:none;user-select:none}
+.prod-card:hover{border-color:rgba(0,102,255,.4);transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.prod-img{width:100%;height:180px;object-fit:cover;display:block;background:var(--s2);transition:transform .4s}
+.prod-card:hover .prod-img{transform:scale(1.04)}
+.prod-body{padding:14px}
+.prod-cat{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;margin-bottom:6px}
+.prod-body h3{font-size:14px;font-weight:700;margin-bottom:4px;line-height:1.3}
+.prod-body p{font-size:12px;color:var(--mt);margin-bottom:10px;line-height:1.4}
+.prod-price{font-size:20px;font-weight:800;color:var(--blue);margin-bottom:12px}
+.btn-detail{width:100%;padding:10px;background:rgba(0,102,255,.1);border:1px solid rgba(0,102,255,.25);border-radius:10px;color:var(--blue);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-detail:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.empty-msg{text-align:center;padding:60px 0;color:var(--mt2);display:none}
+
+/* ── PRODUCT DETAIL ── */
+.det-wrap{max-width:840px;margin:0 auto;padding:12px 20px 80px}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.det-img-box{border-radius:18px;overflow:hidden;border:1px solid var(--bd);background:var(--s1)}
+.det-img-box img{width:100%;height:300px;object-fit:cover;display:block}
+.det-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--blue);text-transform:uppercase;padding:5px 14px;border:1px solid rgba(0,102,255,.3);border-radius:50px;margin-bottom:12px}
+.det-info h1{font-size:clamp(18px,4vw,26px);font-weight:800;line-height:1.2;margin-bottom:8px}
+.det-price{font-size:32px;font-weight:800;color:var(--blue);margin:12px 0}
+.det-hr{border:none;border-top:1px solid var(--bd);margin:16px 0}
+.det-desc{font-size:14px;color:var(--mt);line-height:1.75;margin-bottom:16px}
+.det-feats{list-style:none;margin-bottom:18px;display:flex;flex-direction:column;gap:7px}
+.det-feats li{display:flex;align-items:center;gap:8px;font-size:13px;color:#ccc}
+.det-feats li::before{content:'✓';color:var(--blue);font-weight:700;flex-shrink:0}
+.specs-box{background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.specs-head{padding:11px 16px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--mt);text-transform:uppercase;border-bottom:1px solid var(--bd)}
+.spec-row{display:flex;padding:10px 16px;border-bottom:1px solid #0d0d0d;font-size:13px}
+.spec-row:last-child{border-bottom:none}
+.spec-k{color:var(--mt);width:130px;flex-shrink:0}
+.spec-v{color:#fff;font-weight:500}
+.det-actions{display:flex;flex-direction:column;gap:10px}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .25s}
+.btn-wa.green{background:#25D366;color:#fff;box-shadow:0 4px 16px rgba(37,211,102,.2)}
+.btn-wa.green:hover{background:#1db954;transform:translateY(-2px)}
+.btn-wa.outline{background:transparent;color:var(--mt);border:1px solid var(--bd)}
+.btn-wa.outline:hover{border-color:#fff;color:#fff}
+
+/* ── QUEM SOMOS ── */
+.vini-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+.vini-media{display:flex;flex-direction:column;gap:14px}
+.vini-photo{border-radius:20px;overflow:hidden;border:1px solid var(--bd);box-shadow:0 20px 50px rgba(0,102,255,.15)}
+.vini-photo img{width:100%;display:block;object-fit:cover}
+.vini-video{border-radius:20px;overflow:hidden;border:1px solid var(--bd);aspect-ratio:16/9}
+.vini-video iframe{width:100%;height:100%;border:none;display:block}
+.vini-info{display:flex;flex-direction:column;gap:18px;padding-top:6px}
+.vini-name{font-size:clamp(26px,5vw,44px);font-weight:800;line-height:1.1;letter-spacing:-1px}
+.vini-name span{color:var(--blue)}
+.vini-role{font-size:12px;color:#555;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-top:5px}
+.vini-bar{width:44px;height:3px;background:linear-gradient(90deg,var(--blue),transparent);border-radius:2px}
+.vini-bio{font-size:15px;color:#aaa;line-height:1.85}
+.vini-badges{display:flex;flex-wrap:wrap;gap:8px}
+.vini-badge{display:flex;align-items:center;gap:7px;background:rgba(0,102,255,.07);border:1px solid rgba(0,102,255,.18);border-radius:50px;padding:8px 14px;font-size:13px;font-weight:600;color:#ccc}
+.vini-cta{display:inline-flex;align-items:center;gap:10px;background:#25D366;color:#fff;border:none;border-radius:12px;padding:14px 22px;font-size:15px;font-weight:700;text-decoration:none;transition:all .25s;box-shadow:0 4px 16px rgba(37,211,102,.2);width:fit-content}
+.vini-cta:hover{background:#1db954;transform:translateY(-2px)}
+
+/* ── ORÇAMENTO ── */
+.orc-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+.orc-info{display:flex;flex-direction:column;gap:20px;padding-top:8px}
+.orc-info h3{font-size:clamp(20px,4vw,30px);font-weight:800;line-height:1.2}
+.orc-info h3 span{color:var(--blue)}
+.orc-info p{font-size:14px;color:var(--mt);line-height:1.7}
+.orc-steps{display:flex;flex-direction:column;gap:14px}
+.orc-step{display:flex;align-items:flex-start;gap:14px}
+.orc-step-num{width:32px;height:32px;border-radius:50%;background:rgba(0,102,255,.12);border:1px solid rgba(0,102,255,.3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;margin-top:2px}
+.orc-step-txt strong{font-size:14px;font-weight:700;display:block;margin-bottom:2px}
+.orc-step-txt span{font-size:13px;color:var(--mt)}
+.orc-form{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:16px}
+.orc-form h3{font-size:18px;font-weight:700;margin-bottom:4px}
+.orc-form p{font-size:13px;color:var(--mt);margin-bottom:4px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:12px;font-weight:600;color:var(--mt);letter-spacing:.5px;text-transform:uppercase}
+.form-input,.form-textarea{background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;color:#fff;font-size:14px;padding:12px 16px;outline:none;transition:all .3s;font-family:inherit;width:100%}
+.form-input:focus,.form-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--mt2)}
+.form-textarea{resize:vertical;min-height:110px;line-height:1.6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn-orc{display:flex;align-items:center;justify-content:center;gap:10px;background:#25D366;color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 4px 16px rgba(37,211,102,.2);width:100%}
+.btn-orc:hover{background:#1db954;transform:translateY(-2px)}
+.form-note{font-size:12px;color:var(--mt2);text-align:center;line-height:1.5}
+
+/* ── FEEDBACKS ── */
+.feed-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.feed-card{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:24px;transition:all .3s}
+.feed-card:hover{border-color:rgba(0,102,255,.3);transform:translateY(-3px)}
+.feed-stars{color:#FFD700;font-size:16px;margin-bottom:12px;letter-spacing:2px}
+.feed-text{font-size:14px;color:#bbb;line-height:1.7;margin-bottom:18px;font-style:italic}
+.feed-author{display:flex;align-items:center;gap:12px}
+.feed-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#0044cc);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
+.feed-name{font-size:14px;font-weight:700}
+.feed-since{font-size:12px;color:var(--mt)}
+.feed-cta{margin-top:40px;background:var(--s1);border:1px solid rgba(0,102,255,.2);border-radius:20px;padding:32px;text-align:center}
+.feed-cta h3{font-size:clamp(16px,4vw,24px);font-weight:800;margin-bottom:8px}
+.feed-cta p{color:var(--mt);font-size:14px;margin-bottom:22px}
+
+
+
+/* ── HOME ORÇAMENTO ── */
+.home-orc{width:100%;max-width:560px;margin-top:56px;text-align:center}
+.home-orc-title{font-size:clamp(20px,5vw,32px);font-weight:800;line-height:1.2;margin-bottom:8px}
+.home-orc-sub{color:var(--mt);font-size:14px;margin-bottom:24px}
+.home-orc-form{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:24px;text-align:left;display:flex;flex-direction:column;gap:14px}
+.horc-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:480px){.horc-row{grid-template-columns:1fr}}
+
+/* ── CATEGORY TABS ── */
+.cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;justify-content:center}
+.cat-tab{background:var(--s1);border:1.5px solid var(--bd);color:var(--mt);font-size:13px;font-weight:600;padding:8px 16px;border-radius:50px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.cat-tab:hover{border-color:rgba(0,102,255,.4);color:#fff}
+.cat-tab.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 14px var(--blue-glow)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .nav-links{display:none}.hamburger{display:flex}
+  #home-page{padding:64px 16px 48px}
+  .hero-search{max-width:100%}
+  .hero-btns{flex-direction:column;align-items:stretch;width:100%;max-width:280px}
+  .btn-pri,.btn-ghost{width:100%;text-align:center}
+  .stats{gap:20px}
+  .sec-hero{padding:24px 16px 20px}
+  .sec-wrap{padding:0 16px 60px}
+  .back-btn{margin:14px}
+  .svc-grid{grid-template-columns:1fr}
+  .prod-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .prod-img{height:140px}
+  .prod-body{padding:11px}
+  .prod-body h3{font-size:13px}
+  .prod-price{font-size:16px;margin-bottom:10px}
+  .btn-detail{font-size:12px;padding:9px}
+  .det-grid{grid-template-columns:1fr}
+  .det-img-box img{height:220px}
+  .det-price{font-size:26px}
+  .vini-grid{grid-template-columns:1fr}
+  .orc-grid{grid-template-columns:1fr}
+  .orc-info{order:2}
+  .orc-form{order:1}
+  .form-row{grid-template-columns:1fr}
+  .feed-grid{grid-template-columns:1fr}
+  .feed-cta{padding:24px 16px}
+  #heroDrop{left:-4px;right:-4px}
+}
+@media(max-width:380px){
+  .prod-grid{grid-template-columns:1fr}
+  .hero-title{font-size:clamp(22px,10vw,32px)}
+}
+@media(hover:none){
+  .prod-card:hover,.svc-card:hover,.feed-card:hover{transform:none;box-shadow:none}
+  .btn-pri:hover,.btn-ghost:hover,.vini-cta:hover,.btn-wa.green:hover,.btn-orc:hover{transform:none}
+}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+<div class="app">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="goPage('home-page')">
+    <img src="https://a.lovart.ai/artifacts/user/GqQ0cGZomL6mc2UA.png" alt="EstetCar">
+    <span>EstetCar</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="goPage('home-page',this)">Home</button>
+    <button class="nav-btn" onclick="goPage('vini-page',this)">Quem Somos</button>
+    <button class="nav-btn" onclick="goPage('servicos-page',this)">Serviços</button>
+    <button class="nav-btn" onclick="goPage('produtos-page',this)">Produtos</button>
+    <button class="nav-btn" onclick="goPage('feed-page',this)">Avaliações</button>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <button class="mob-btn" onclick="goPage('home-page');closeMenu()">🏠 Home</button>
+  <button class="mob-btn" onclick="goPage('vini-page');closeMenu()">👤 Quem Somos</button>
+  <button class="mob-btn" onclick="goPage('servicos-page');closeMenu()">🔧 Serviços</button>
+  <button class="mob-btn" onclick="goPage('produtos-page');closeMenu()">🛍️ Produtos</button>
+  <button class="mob-btn" onclick="goPage('feed-page');closeMenu()">⭐ Avaliações</button>
+</div>
+
+<!-- ══════════════════════════════ HOME ══════════════════════════════ -->
+<div id="home-page" class="page active">
+  <div class="hero-search">
+    <input type="text" id="homeIn" placeholder="Buscar produto ou serviço..." oninput="liveSearch(this.value)" autocomplete="off">
+    <button class="srch-btn" onclick="liveSearch(document.getElementById('homeIn').value)">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <div id="heroDrop"></div>
+  </div>
+  <img src="https://a.lovart.ai/artifacts/user/GqQ0cGZomL6mc2UA.png" alt="EstetCar" class="home-logo">
+  <div class="hero-title">Seu <span class="hl">Auto Center</span><br>de Confiança</div>
+  <p class="hero-sub">Peças, serviços e produtos para manter seu veículo sempre em dia.</p>
+  <div class="hero-btns">
+    <button class="btn-pri" onclick="goPage('servicos-page')">Ver Serviços</button>
+    <button class="btn-ghost" onclick="goPage('produtos-page')">Ver Produtos</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">500+</div><div class="stat-lbl">Clientes</div></div>
+    <div class="stat"><div class="stat-num">10+</div><div class="stat-lbl">Produtos</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Satisfação</div></div>
+  </div>
+
+  <!-- Orçamento inline na home -->
+  <div class="home-orc">
+    <div class="tag" style="margin-bottom:14px">// Orçamento Grátis</div>
+    <h3 class="home-orc-title">Solicite seu orçamento<br><span style="color:var(--blue)">agora mesmo</span></h3>
+    <p class="home-orc-sub">Preencha abaixo e receba retorno pelo WhatsApp</p>
+    <div class="home-orc-form">
+      <div class="horc-row">
+        <div class="form-group">
+          <label class="form-label">Seu Nome *</label>
+          <input class="form-input" id="oNome" type="text" placeholder="Ex: João Silva" maxlength="60">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Seu WhatsApp *</label>
+          <input class="form-input" id="oTel" type="tel" placeholder="(00) 00000-0000" maxlength="20">
+        </div>
+      </div>
+      <div class="horc-row">
+        <div class="form-group">
+          <label class="form-label">Placa *</label>
+          <input class="form-input" id="oPlaca" type="text" placeholder="ABC-1234" maxlength="10">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Veículo *</label>
+          <input class="form-input" id="oModelo" type="text" placeholder="Ex: Gol 2018" maxlength="40">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descreva o problema *</label>
+        <textarea class="form-textarea" id="oProblema" placeholder="Ex: Carro não está partindo, barulho ao frear, luz do painel acesa..."></textarea>
+      </div>
+      <button class="btn-orc" onclick="enviarOrcamento()">
+        <svg width="18" height="18" viewBox="0 0 32 32" fill="white"><path d="M16 0C7.164 0 0 7.164 0 16c0 2.828.736 5.484 2.02 7.78L.076 31.924l8.356-2.192A15.934 15.934 0 0016 32c8.836 0 16-7.164 16-16S24.836 0 16 0zm0 29.336c-2.548 0-4.944-.708-7.004-1.936l-.5-.296-5.18 1.356 1.38-5.04-.328-.52A13.276 13.276 0 012.664 16c0-7.364 5.972-13.336 13.336-13.336S29.336 8.636 29.336 16 23.364 29.336 16 29.336zm7.308-9.988c-.4-.2-2.368-1.168-2.736-1.3-.368-.132-.636-.2-.904.2-.268.4-1.036 1.3-1.268 1.568-.232.268-.468.3-.868.1-.4-.2-1.688-.62-3.216-1.98-1.188-1.056-1.992-2.36-2.224-2.76-.232-.4-.024-.616.176-.816.18-.18.4-.468.6-.7.2-.232.268-.4.4-.668.132-.268.068-.5-.032-.7-.1-.2-.904-2.176-1.24-2.98-.328-.784-.66-.676-.904-.688-.232-.012-.5-.016-.768-.016s-.7.1-1.068.5c-.368.4-1.404 1.372-1.404 3.348s1.436 3.884 1.636 4.152c.2.268 2.828 4.316 6.852 6.052.956.412 1.704.66 2.288.844.96.304 1.836.26 2.528.156.772-.116 2.368-.968 2.7-1.904.332-.936.332-1.74.232-1.904-.1-.164-.368-.264-.768-.464z"/></svg> Enviar pelo WhatsApp
+      </button>
+      <p class="form-note">Ao clicar você será redirecionado ao WhatsApp da EstetCar com sua mensagem pronta.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ QUEM SOMOS ══════════════════════════════ -->
+<div id="vini-page" class="page">
+  <button class="back-btn" onclick="goPage('home-page')">← Voltar</button>
+  <div class="sec-hero">
+    <div class="tag">// Quem Somos</div>
+    <h2 class="sec-title">Conheça o dono<br><span style="color:var(--blue)">da EstetCar</span></h2>
+  </div>
+  <div class="sec-wrap" style="padding-top:0">
+    <div class="vini-grid">
+      <div class="vini-media">
+        <div class="vini-photo">
+          <img src="https://a.lovart.ai/artifacts/user/GqQ0cGZomL6mc2UA.png" alt="Vinício Santos" id="viniPhoto">
+        </div>
+        <div>
+          <a href="https://www.instagram.com/estetcar_2024?igsh=MTRieDg1MjM5NW5ldg==" target="_blank" style="display:block;border-radius:20px;overflow:hidden;border:1px solid #1e1e1e;box-shadow:0 20px 50px rgba(0,102,255,.15);">
+            <img src="https://i.ibb.co/0yvH6YjX/file-00000000393871f5bf9600c1790ad34a.png" alt="Vinício Santos — EstetCar Auto Center" style="width:100%;display:block;object-fit:contain;background:#000;">
+          </a>
+          <a href="https://www.instagram.com/estetcar_2024?igsh=MTRieDg1MjM5NW5ldg==" target="_blank" style="display:inline-flex;align-items:center;gap:7px;margin-top:10px;color:#888;font-size:12px;text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#e1306c'" onmouseout="this.style.color='#888'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            @estetcar_2024 · Ver no Instagram
+          </a>
+        </div>
+      </div>
+      <div class="vini-info">
+        <span class="tag" style="margin-bottom:0">// Fundador</span>
+        <div>
+          <div class="vini-name">Vinício<br><span>Santos</span></div>
+          <div class="vini-role">Fundador &amp; Dono · EstetCar Auto Center</div>
+        </div>
+        <div class="vini-bar"></div>
+        <p class="vini-bio">Apaixonado por carros e por fazer bem feito, Vinício Santos fundou a EstetCar com um propósito claro: oferecer serviços automotivos de alta qualidade com honestidade e dedicação. Certificado em Eletrônica Avançada Automotiva, atende cada cliente com atenção e comprometimento total.</p>
+        <div class="vini-badges">
+          <div class="vini-badge">🏆 Certificado em Eletrônica</div>
+          <div class="vini-badge">🚗 Especialista Automotivo</div>
+          <div class="vini-badge">⭐ Atendimento Premium</div>
+        </div>
+        <a href="https://wa.me/557388108207?text=Ol%C3%A1%20Vin%C3%ADcio%2C%20vi%20o%20site%20e%20quero%20saber%20mais%20sobre%20a%20EstetCar!" target="_blank" class="vini-cta">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="white"><path d="M16 0C7.164 0 0 7.164 0 16c0 2.828.736 5.484 2.02 7.78L.076 31.924l8.356-2.192A15.934 15.934 0 0016 32c8.836 0 16-7.164 16-16S24.836 0 16 0zm0 29.336c-2.548 0-4.944-.708-7.004-1.936l-.5-.296-5.18 1.356 1.38-5.04-.328-.52A13.276 13.276 0 012.664 16c0-7.364 5.972-13.336 13.336-13.336S29.336 8.636 29.336 16 23.364 29.336 16 29.336zm7.308-9.988c-.4-.2-2.368-1.168-2.736-1.3-.368-.132-.636-.2-.904.2-.268.4-1.036 1.3-1.268 1.568-.232.268-.468.3-.868.1-.4-.2-1.688-.62-3.216-1.98-1.188-1.056-1.992-2.36-2.224-2.76-.232-.4-.024-.616.176-.816.18-.18.4-.468.6-.7.2-.232.268-.4.4-.668.132-.268.068-.5-.032-.7-.1-.2-.904-2.176-1.24-2.98-.328-.784-.66-.676-.904-.688-.232-.012-.5-.016-.768-.016s-.7.1-1.068.5c-.368.4-1.404 1.372-1.404 3.348s1.436 3.884 1.636 4.152c.2.268 2.828 4.316 6.852 6.052.956.412 1.704.66 2.288.844.96.304 1.836.26 2.528.156.772-.116 2.368-.968 2.7-1.904.332-.936.332-1.74.232-1.904-.1-.164-.368-.264-.768-.464z"/></svg>
+          Falar com o Vinício
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ SERVIÇOS ══════════════════════════════ -->
+<div id="servicos-page" class="page">
+  <button class="back-btn" onclick="goPage('home-page')">← Voltar</button>
+  <div class="sec-hero">
+    <div class="tag">// Nossos Serviços</div>
+    <h2 class="sec-title">O que podemos<br>fazer pelo seu carro</h2>
+    <p class="sec-sub">Serviços especializados com qualidade e rapidez.</p>
+  </div>
+  <div class="sec-wrap">
+    <div class="divider-label">Preventivos</div>
+    <div class="svc-grid">
+      <div class="service-card svc-card">
+        <div class="svc-icon">🚗</div>
+        <h3>Limpeza de Bicos Injetores</h3>
+        <p>Restaura a performance e a economia de combustível do seu veículo.</p>
+        <a href="https://wa.me/557388108207?text=Ol%C3%A1%2C%20quero%20or%C3%A7amento%3A%20Limpeza%20de%20Bicos%20Injetores" target="_blank" class="svc-btn">💬 Solicitar Orçamento</a>
+      </div>
+      <div class="service-card svc-card">
+        <div class="svc-icon">⚙️</div>
+        <h3>Troca de Correia Dentada</h3>
+        <p>Prevenção contra danos graves ao motor — não deixe para depois.</p>
+        <a href="https://wa.me/557388108207?text=Ol%C3%A1%2C%20quero%20or%C3%A7amento%3A%20Troca%20de%20Correia%20Dentada" target="_blank" class="svc-btn">💬 Solicitar Orçamento</a>
+      </div>
+      <div class="service-card svc-card">
+        <div class="svc-icon">🛑</div>
+        <h3>Revisão de Freios</h3>
+        <p>Segurança em primeiro lugar — freios sempre em perfeito estado.</p>
+        <a href="https://wa.me/557388108207?text=Ol%C3%A1%2C%20quero%20or%C3%A7amento%3A%20Revis%C3%A3o%20de%20Freios" target="_blank" class="svc-btn">💬 Solicitar Orçamento</a>
+      </div>
+    </div>
+    <div class="divider-label" style="margin-top:32px">Em Breve</div>
+    <div style="background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:48px;text-align:center;color:var(--mt2)">
+      <p style="font-size:28px;margin-bottom:8px">🔜</p>
+      <p style="font-size:14px">Novos serviços chegando em breve</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ PRODUTOS ══════════════════════════════ -->
+<div id="produtos-page" class="page">
+  <button class="back-btn" onclick="goPage('home-page')">← Voltar</button>
+  <div class="sec-hero">
+    <div class="tag">// Nossos Produtos</div>
+    <h2 class="sec-title">Peças e produtos<br>de qualidade</h2>
+    <p class="sec-sub">Escolha uma categoria ou busque diretamente.</p>
+  </div>
+  <div class="sec-wrap">
+
+    <!-- Search -->
+    <div class="prod-search">
+      <input type="text" id="prodIn" placeholder="Buscar produto..." oninput="filterProd(this.value)" autocomplete="off">
+      <button class="prod-srch-btn" onclick="filterProd(document.getElementById('prodIn').value)">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+    </div>
+
+    <!-- Category tabs -->
+    <div class="cat-tabs" id="catTabs">
+      <button class="cat-tab active" onclick="filterCat('todos',this)">🔍 Todos</button>
+      <button class="cat-tab" onclick="filterCat('Baterias',this)">🔋 Baterias</button>
+      <button class="cat-tab" onclick="filterCat('Iluminação',this)">💡 Iluminação</button>
+      <button class="cat-tab" onclick="filterCat('Fluidos',this)">💧 Fluidos</button>
+      <button class="cat-tab" onclick="filterCat('Freios',this)">🛑 Freios</button>
+      <button class="cat-tab" onclick="filterCat('Filtros',this)">🔧 Filtros</button>
+      <button class="cat-tab" onclick="filterCat('Suspensão',this)">🚗 Suspensão</button>
+      <button class="cat-tab" onclick="filterCat('Presilhas',this)">🔩 Presilhas</button>
+    </div>
+
+    <div class="empty-msg" id="emptyMsg">
+      <p style="font-size:18px;margin-bottom:6px">Nenhum produto encontrado</p>
+      <span style="font-size:13px">Tente outro termo</span>
+    </div>
+
+    <div class="prod-grid" id="prodGrid">
+
+      <div class="prod-card" data-search="bateria pioneiro automotiva 12v" data-cat="Baterias">
+        <img class="prod-img" src="https://i.ibb.co/P2P2pq3/Bateria-com-logo-corrigida.png" alt="Bateria Pioneiro">
+        <div class="prod-body">
+          <div class="prod-cat">🔋 Baterias</div>
+          <h3>Bateria Automotiva Pioneiro</h3>
+          <p>12V · Garantia 18 meses · Free</p>
+          <div class="prod-price">R$ 560,00</div>
+          <button class="btn-detail" onclick="goPage('det-pioneiro')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="bateria onbat free f60dn 60ah" data-cat="Baterias">
+        <img class="prod-img" src="https://i.ibb.co/bjCSTvN5/bateria-onbat-site-estetecar.png" alt="Bateria Onbat">
+        <div class="prod-body">
+          <div class="prod-cat">🔋 Baterias</div>
+          <h3>Bateria Onbat Free F60DN</h3>
+          <p>12V 60Ah · 430A CCA · INMETRO</p>
+          <div class="prod-price">R$ 440,00</div>
+          <button class="btn-detail" onclick="goPage('det-onbat')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="lampada philips h1 standard halogena 12v 55w" data-cat="Iluminação">
+        <img class="prod-img" src="https://i.ibb.co/Wpx7wwd4/Chat-GPT-Image-24-de-abr-de-2026-10-43-36.png" alt="Lâmpada Philips H1">
+        <div class="prod-body">
+          <div class="prod-cat">💡 Iluminação</div>
+          <h3>Lâmpada Philips H1 Standard</h3>
+          <p>12V 55W · P14.5s · Original Equipment</p>
+          <div class="prod-price">R$ 30,00</div>
+          <button class="btn-detail" onclick="goPage('det-philips')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="lampada asx h11 halogena original clear 12v 55w" data-cat="Iluminação">
+        <img class="prod-img" src="https://i.ibb.co/JR3ScJT7/L-mpada-com-logo-Estetcar-ajustada.png" alt="Lâmpada ASX H11">
+        <div class="prod-body">
+          <div class="prod-cat">💡 Iluminação</div>
+          <h3>Lâmpada ASX H11 Original Clear</h3>
+          <p>12V 55W · PGJ19-2 · Halógena</p>
+          <div class="prod-price">R$ 35,00</div>
+          <button class="btn-detail" onclick="goPage('det-asx')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="lampada asx super branca h11 12v 55w" data-cat="Iluminação">
+        <img class="prod-img" src="https://i.ibb.co/Q7mYgYw7/7b54141d-a6e9-4cf8-995b-873aa8472b78.jpg" alt="Lâmpada ASX Super Branca H11">
+        <div class="prod-body">
+          <div class="prod-cat">💡 Iluminação</div>
+          <h3>Lâmpada ASX Super Branca H11</h3>
+          <p>12V 55W · Luz branca intensa</p>
+          <div class="prod-price">A consultar</div>
+          <button class="btn-detail" onclick="goPage('det-asx-branca')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="lampada asx h4 clear 12v 55w halogena" data-cat="Iluminação">
+        <img class="prod-img" src="https://i.ibb.co/4ng6cJVF/21e1689a-1054-4c14-ae77-010800bc518f.jpg" alt="Lâmpada ASX H4 Clear">
+        <div class="prod-body">
+          <div class="prod-cat">💡 Iluminação</div>
+          <h3>Lâmpada ASX H4 Clear</h3>
+          <p>12V 55W · Duplo filamento</p>
+          <div class="prod-price">A consultar</div>
+          <button class="btn-detail" onclick="goPage('det-asx-h4')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="agua desmineralizada neo pure 1l bateria radiador" data-cat="Fluidos">
+        <img class="prod-img" src="https://i.ibb.co/svPN2wdv/Chat-GPT-Image-23-de-abr-de-2026-15-08-51.png" alt="Água Desmineralizada">
+        <div class="prod-body">
+          <div class="prod-cat">💧 Fluidos</div>
+          <h3>Água Desmineralizada Neo Pure</h3>
+          <p>1 Litro · Bateria e radiador</p>
+          <div class="prod-price">R$ 7,00</div>
+          <button class="btn-detail" onclick="goPage('det-agua')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="paraflu aditivo radiador long life rosa 1l" data-cat="Fluidos">
+        <img class="prod-img" src="https://i.ibb.co/ZzY1cWyx/paraflu.png" alt="Paraflu">
+        <div class="prod-body">
+          <div class="prod-cat">💧 Fluidos</div>
+          <h3>Paraflu Long Life 1L Rosa</h3>
+          <p>Aditivo para radiador · Anticorrosão</p>
+          <div class="prod-price">R$ 33,00</div>
+          <button class="btn-detail" onclick="goPage('det-paraflu')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="pastilha freio speed brake alta performance" data-cat="Freios">
+        <img class="prod-img" src="https://i.ibb.co/bM8RJWWx/Whats-App-Image-2026-04-15-at-04-31-45.jpg" alt="Pastilhas de Freio">
+        <div class="prod-body">
+          <div class="prod-cat">🛑 Freios</div>
+          <h3>Pastilhas de Freio Speed Brake</h3>
+          <p>Alta performance · Baixo ruído</p>
+          <div class="prod-price">R$ 89,90</div>
+          <button class="btn-detail" onclick="goPage('det-pastilha')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="filtro combustivel vox motor gasolina etanol" data-cat="Filtros">
+        <img class="prod-img" src="https://i.ibb.co/Z6SPCW0X/d0abf705-d49a-4abd-a4a6-c042528c9e40.jpg" alt="Filtro de Combustível Vox">
+        <div class="prod-body">
+          <div class="prod-cat">🔧 Filtros</div>
+          <h3>Filtro de Combustível Vox</h3>
+          <p>Alta filtragem · Motor protegido</p>
+          <div class="prod-price">A consultar</div>
+          <button class="btn-detail" onclick="goPage('det-filtro')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="nakata amortecedor pressurizado suspensao" data-cat="Suspensão">
+        <img class="prod-img" src="https://i.ibb.co/RXc4YHj/006fbeea-c577-4357-829b-b42a0ed0f13d.jpg" alt="Amortecedor Nakata Pressurizado">
+        <div class="prod-body">
+          <div class="prod-cat">🚗 Suspensão</div>
+          <h3>Amortecedor Nakata Pressurizado</h3>
+          <p>Alta performance · Conforto e segurança</p>
+          <div class="prod-price">A consultar</div>
+          <button class="btn-detail" onclick="goPage('det-nakata')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="presilha amarela paralama 19mm fixador plastico" data-cat="Presilhas">
+        <img class="prod-img" src="https://i.ibb.co/3y8r4f3Y/presilha-19mm-po-10mm.png" alt="Presilha Amarela">
+        <div class="prod-body">
+          <div class="prod-cat">🔩 Presilhas</div>
+          <h3>Presilha Amarela Para-lama</h3>
+          <p>19mm × 10mm · Fixador plástico</p>
+          <div class="prod-price">R$ 5,00</div>
+          <button class="btn-detail" onclick="goPage('det-p-amarela')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="presilha preta paralama 12mm fixador plastico" data-cat="Presilhas">
+        <img class="prod-img" src="https://i.ibb.co/G4dSxcRC/presilha-12mm-por-4mm.png" alt="Presilha Preta">
+        <div class="prod-body">
+          <div class="prod-cat">🔩 Presilhas</div>
+          <h3>Presilha Preta Para-lama</h3>
+          <p>12mm × 4mm · Encaixe rápido</p>
+          <div class="prod-price">R$ 5,00</div>
+          <button class="btn-detail" onclick="goPage('det-p-preta')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="presilha parafuso preta rosca 22mm fixador plastico" data-cat="Presilhas">
+        <img class="prod-img" src="https://i.ibb.co/0jgG4s44/presilha-19mm-7mm.png" alt="Presilha Parafuso">
+        <div class="prod-body">
+          <div class="prod-cat">🔩 Presilhas</div>
+          <h3>Presilha Estilo Parafuso</h3>
+          <p>22mm × 6mm · Fixação com rosca</p>
+          <div class="prod-price">R$ 5,00</div>
+          <button class="btn-detail" onclick="goPage('det-p-parafuso')">Ver Detalhes</button>
+        </div>
+      </div>
+
+      <div class="prod-card" data-search="bateria moura 60 amperes automotiva" data-cat="Baterias">
+        <img class="prod-img" src="https://i.ibb.co/xKgXpJ0Z/2f5ec39c-e85d-4707-ba56-b14b8d3c9b3b.png" alt="Bateria Moura 60Ah">
+        <div class="prod-body">
+          <div class="prod-cat">🔋 Baterias</div>
+          <h3>Bateria Moura 60Ah</h3>
+          <p>12V · 60 Amperes · Alta durabilidade</p>
+          <div class="prod-price">A consultar</div>
+          <button class="btn-detail" onclick="goPage('det-moura')">Ver Detalhes</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ DETALHES ══════════════════════════════ -->
+<script>
+var WA = "557388108207";
+var waSvg = '<svg width="20" height="20" viewBox="0 0 32 32" fill="white"><path d="M16 0C7.164 0 0 7.164 0 16c0 2.828.736 5.484 2.02 7.78L.076 31.924l8.356-2.192A15.934 15.934 0 0016 32c8.836 0 16-7.164 16-16S24.836 0 16 0zm0 29.336c-2.548 0-4.944-.708-7.004-1.936l-.5-.296-5.18 1.356 1.38-5.04-.328-.52A13.276 13.276 0 012.664 16c0-7.364 5.972-13.336 13.336-13.336S29.336 8.636 29.336 16 23.364 29.336 16 29.336zm7.308-9.988c-.4-.2-2.368-1.168-2.736-1.3-.368-.132-.636-.2-.904.2-.268.4-1.036 1.3-1.268 1.568-.232.268-.468.3-.868.1-.4-.2-1.688-.62-3.216-1.98-1.188-1.056-1.992-2.36-2.224-2.76-.232-.4-.024-.616.176-.816.18-.18.4-.468.6-.7.2-.232.268-.4.4-.668.132-.268.068-.5-.032-.7-.1-.2-.904-2.176-1.24-2.98-.328-.784-.66-.676-.904-.688-.232-.012-.5-.016-.768-.016s-.7.1-1.068.5c-.368.4-1.404 1.372-1.404 3.348s1.436 3.884 1.636 4.152c.2.268 2.828 4.316 6.852 6.052.956.412 1.704.66 2.288.844.96.304 1.836.26 2.528.156.772-.116 2.368-.968 2.7-1.904.332-.936.332-1.74.232-1.904-.1-.164-.368-.264-.768-.464z"/></svg>';
+
+var PRODS = [
+  {id:'det-pioneiro',img:'https://i.ibb.co/P2P2pq3/Bateria-com-logo-corrigida.png',alt:'Bateria Pioneiro',badge:'🔋 Baterias',name:'Bateria Automotiva Pioneiro',price:'R$ 560,00',desc:'Bateria Pioneiro Free com garantia estendida de 18 meses. Alta corrente de partida e tecnologia de baixa manutenção para veículos de passeio.',feats:['12V de tensão','Garantia de 18 meses','Tecnologia Free — baixa manutenção','Alta corrente de partida'],specs:[['Marca','Pioneiro'],['Tensão','12V'],['Tecnologia','Free'],['Garantia','18 meses']],buy:'Bateria+Automotiva+Pioneiro+-+R%24+560%2C00',ask:'Bateria+Automotiva+Pioneiro'},
+  {id:'det-onbat',img:'https://i.ibb.co/bjCSTvN5/bateria-onbat-site-estetecar.png',alt:'Bateria Onbat',badge:'🔋 Baterias',name:'Bateria Onbat Free F60DN',price:'R$ 440,00',desc:'Bateria SLI Flooded certificada pelo INMETRO. 60Ah de capacidade e 430A de corrente de partida para uma partida sempre garantida.',feats:['12V · 60Ah','430A CCA','Reserva 90 min','INMETRO · Baixa manutenção'],specs:[['Marca','Onbat'],['Modelo','F60DN · F0829'],['Tensão','12V'],['Capacidade','60Ah'],['CCA','430A'],['Peso','14,1 kg']],buy:'Bateria+Onbat+Free+F60DN+-+R%24+440%2C00',ask:'Bateria+Onbat+F60DN'},
+  {id:'det-philips',img:'https://i.ibb.co/Wpx7wwd4/Chat-GPT-Image-24-de-abr-de-2026-10-43-36.png',alt:'Philips H1',badge:'💡 Iluminação',name:'Lâmpada Philips H1 Standard',price:'R$ 30,00',desc:'Original Equipment Philips. Iluminação confiável e de alta qualidade — padrão de fábrica desde 1914.',feats:['12V · 55W','Base P14.5s','Luz original','Original Equipment'],specs:[['Marca','Philips'],['Modelo','H1 · 12258C1'],['Tensão','12V'],['Potência','55W'],['Base','P14.5s']],buy:'L%C3%A2mpada+Philips+H1+Standard+-+R%24+30%2C00',ask:'L%C3%A2mpada+Philips+H1'},
+  {id:'det-asx',img:'https://i.ibb.co/JR3ScJT7/L-mpada-com-logo-Estetcar-ajustada.png',alt:'ASX H11',badge:'💡 Iluminação',name:'Lâmpada ASX H11 Original Clear',price:'R$ 35,00',desc:'Halógena linha Original Clear com luz branco amarelado neutro. Para faróis com encaixe H11.',feats:['12V · 55W','Base PGJ19-2','Cor original — branco amarelado','Halógena Original Clear'],specs:[['Marca','ASX'],['Modelo','H11'],['Tensão','12V'],['Potência','55W'],['Base','PGJ19-2']],buy:'L%C3%A2mpada+ASX+H11+Original+Clear+-+R%24+35%2C00',ask:'L%C3%A2mpada+ASX+H11'},
+  {id:'det-agua',img:'https://i.ibb.co/svPN2wdv/Chat-GPT-Image-23-de-abr-de-2026-15-08-51.png',alt:'Água Desmineralizada',badge:'💧 Fluidos',name:'Água Desmineralizada Neo Pure',price:'R$ 7,00',desc:'Água de alta pureza, ideal para baterias e radiadores. Sem minerais para maior durabilidade dos componentes.',feats:['Alta pureza — sem minerais','Ideal para baterias e radiadores','Embalagem de 1 litro'],specs:[['Marca','Neo Pure'],['Volume','1 Litro'],['Tipo','Desmineralizada'],['Aplicação','Bateria / Radiador']],buy:'%C3%81gua+Desmineralizada+Neo+Pure+-+R%24+7%2C00',ask:'%C3%81gua+Desmineralizada+Neo+Pure'},
+  {id:'det-paraflu',img:'https://i.ibb.co/ZzY1cWyx/paraflu.png',alt:'Paraflu',badge:'🌡️ Fluidos',name:'Paraflu Long Life 1L Rosa',price:'R$ 33,00',desc:'Aditivo Long Life que protege contra corrosão e superaquecimento. Fórmula rosa para fácil identificação.',feats:['Proteção contra corrosão','Evita superaquecimento','Fórmula Long Life','1 litro'],specs:[['Marca','Paraflu'],['Volume','1 Litro'],['Cor','Rosa'],['Tipo','Long Life'],['Aplicação','Radiador']],buy:'Paraflu+Long+Life+1L+Rosa+-+R%24+33%2C00',ask:'Paraflu+Long+Life'},
+  {id:'det-pastilha',img:'https://i.ibb.co/bM8RJWWx/Whats-App-Image-2026-04-15-at-04-31-45.jpg',alt:'Pastilhas de Freio',badge:'🛑 Freios',name:'Pastilhas de Freio Speed Brake',price:'R$ 89,90',desc:'Pastilhas de alto desempenho com tecnologia de baixo ruído. Frenagem segura e eficiente para o dia a dia.',feats:['Alta performance de frenagem','Baixo nível de ruído','Menor desgaste no disco','Compatível com múltiplos modelos'],specs:[['Marca','Speed Brake'],['Tipo','Pastilha de Freio'],['Tecnologia','Alta Performance'],['Ruído','Baixo']],buy:'Pastilhas+de+Freio+Speed+Brake+-+R%24+89%2C90',ask:'Pastilhas+de+Freio+Speed+Brake'},
+  {id:'det-p-amarela',img:'https://i.ibb.co/3y8r4f3Y/presilha-19mm-po-10mm.png',alt:'Presilha Amarela',badge:'🔩 Presilhas',name:'Presilha Amarela Para-lama',price:'R$ 5,00',desc:'Presilha plástica amarela para fixação de para-lamas e painéis. Encaixe simples e remoção sem danos.',feats:['Fixação firme','Material plástico resistente','Fácil instalação','Vários modelos'],specs:[['Cor','Amarela'],['Diâmetro','19mm'],['Haste','10mm'],['Aplicação','Para-lama / Painel']],buy:'Presilha+Amarela+Para-lama+19mm+-+R%24+5%2C00',ask:'Presilha+Amarela+Para-lama'},
+  {id:'det-p-preta',img:'https://i.ibb.co/G4dSxcRC/presilha-12mm-por-4mm.png',alt:'Presilha Preta',badge:'🔩 Presilhas',name:'Presilha Preta Para-lama',price:'R$ 5,00',desc:'Presilha de encaixe rápido para fixação de para-lamas e frisos. Design compacto e discreto.',feats:['Encaixe rápido','Alta durabilidade','Design discreto','Compatível com vários modelos'],specs:[['Cor','Preta'],['Diâmetro','12mm'],['Haste','4mm'],['Aplicação','Para-lama / Friso']],buy:'Presilha+Preta+Para-lama+12mm+-+R%24+5%2C00',ask:'Presilha+Preta+Para-lama'},
+  {id:'det-p-parafuso',img:'https://i.ibb.co/0jgG4s44/presilha-19mm-7mm.png',alt:'Presilha Parafuso',badge:'🔩 Presilhas',name:'Presilha Estilo Parafuso',price:'R$ 5,00',desc:'Presilha com rosca para fixação extra firme de para-choques e painéis que exigem maior resistência.',feats:['Fixação extra firme com rosca','Alta resistência','Para-choques e painéis','Remoção manual fácil'],specs:[['Cor','Preta'],['Diâmetro','22mm'],['Haste','6mm'],['Tipo','Rosca'],['Aplicação','Para-choque / Painel']],buy:'Presilha+Estilo+Parafuso+22mm+-+R%24+5%2C00',ask:'Presilha+Estilo+Parafuso'},
+  {id:'det-moura',img:'https://i.ibb.co/xKgXpJ0Z/2f5ec39c-e85d-4707-ba56-b14b8d3c9b3b.png',alt:'Bateria Moura 60Ah',badge:'🔋 Baterias',name:'Bateria Moura 60Ah',price:'A consultar',desc:'A Bateria Moura é referência nacional em qualidade e durabilidade. Com 60 amperes, garante partidas confiáveis e alta performance para veículos de passeio e utilitários.',feats:['12V · 60 Amperes','Alta durabilidade Moura','Tecnologia de baixa manutenção','Referência nacional em baterias'],specs:[['Marca','Moura'],['Tensão','12V'],['Capacidade','60Ah'],['Aplicação','Passeio / Utilitário']],buy:'Ol%C3%A1%2C%20quero%20comprar%3A%20Bateria%20Moura%2060Ah',ask:'Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%3A%20Bateria%20Moura%2060Ah'},
+  {id:'det-asx-branca',img:'https://i.ibb.co/Q7mYgYw7/7b54141d-a6e9-4cf8-995b-873aa8472b78.jpg',alt:'ASX Super Branca H11',badge:'💡 Iluminação',name:'Lâmpada ASX Super Branca H11',price:'A consultar',desc:'Lâmpada halógena ASX Super Branca H11 com tecnologia de luz branca de alta intensidade. Proporciona melhor visibilidade noturna com encaixe H11, compatível com diversos modelos.',feats:['12V · 55W de potência','Luz super branca de alta intensidade','Base H11 — PGJ19-2','Superior visibilidade noturna'],specs:[['Marca','ASX'],['Modelo','H11 Super Branca'],['Tensão','12V'],['Potência','55W'],['Base','PGJ19-2'],['Cor','Super Branca']],buy:'Ol%C3%A1%2C%20quero%20comprar%3A%20L%C3%A2mpada%20ASX%20Super%20Branca%20H11%2012V%2055W',ask:'Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%3A%20L%C3%A2mpada%20ASX%20Super%20Branca%20H11'},
+  {id:'det-asx-h4',img:'https://i.ibb.co/4ng6cJVF/21e1689a-1054-4c14-ae77-010800bc518f.jpg',alt:'ASX H4 Clear',badge:'💡 Iluminação',name:'Lâmpada ASX H4 Clear',price:'A consultar',desc:'Lâmpada halógena ASX H4 linha Clear com luz original natural. Encaixe H4 para faróis duplos — farol alto e baixo em uma única lâmpada.',feats:['12V · 55W de potência','Farol alto e baixo (duplo filamento)','Base P43t — encaixe H4','Luz original Clear'],specs:[['Marca','ASX'],['Modelo','H4 Clear'],['Tensão','12V'],['Potência','55W'],['Base','P43t'],['Filamentos','Duplo (alto e baixo)']],buy:'Ol%C3%A1%2C%20quero%20comprar%3A%20L%C3%A2mpada%20ASX%20H4%20Clear%2012V%2055W',ask:'Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%3A%20L%C3%A2mpada%20ASX%20H4%20Clear'},
+  {id:'det-filtro',img:'https://i.ibb.co/Z6SPCW0X/d0abf705-d49a-4abd-a4a6-c042528c9e40.jpg',alt:'Filtro Combustível Vox',badge:'🔧 Filtros',name:'Filtro de Combustível Vox',price:'A consultar',desc:'Filtro de combustível Vox de alta filtragem, projetado para proteger o sistema de injeção eletrônica contra impurezas. Essencial para a durabilidade do motor.',feats:['Alta capacidade de filtragem','Protege bicos injetores','Compatível com gasolina e etanol','Fácil instalação'],specs:[['Marca','Vox'],['Tipo','Filtro de Combustível'],['Aplicação','Injeção Eletrônica'],['Combustível','Gasolina / Etanol']],buy:'Ol%C3%A1%2C%20quero%20comprar%3A%20Filtro%20de%20Combust%C3%ADvel%20Vox',ask:'Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%3A%20Filtro%20de%20Combust%C3%ADvel%20Vox'},
+  {id:'det-nakata',img:'https://i.ibb.co/RXc4YHj/006fbeea-c577-4357-829b-b42a0ed0f13d.jpg',alt:'Amortecedor Nakata',badge:'🚗 Suspensão',name:'Amortecedor Nakata Pressurizado',price:'A consultar',desc:'Amortecedor Nakata pressurizado de alta performance para maior conforto, estabilidade e segurança em qualquer condição de piso. Tecnologia premium nacional.',feats:['Pressurizado — maior durabilidade','Alta estabilidade em curvas','Conforto superior','Tecnologia Nakata'],specs:[['Marca','Nakata'],['Tipo','Pressurizado'],['Aplicação','Suspensão'],['Tecnologia','Alta Performance']],buy:'Ol%C3%A1%2C%20quero%20comprar%3A%20Amortecedor%20Nakata%20Pressurizado',ask:'Ol%C3%A1%2C%20tenho%20d%C3%BAvidas%20sobre%3A%20Amortecedor%20Nakata%20Pressurizado'},
+];
+
+function makeDetail(p){
+  var feats = p.feats.map(function(f){return '<li>'+f+'</li>';}).join('');
+  var specs = p.specs.map(function(s){return '<div class="spec-row"><div class="spec-k">'+s[0]+'</div><div class="spec-v">'+s[1]+'</div></div>';}).join('');
+  var el = document.createElement('div');
+  el.id = p.id;
+  el.className = 'page';
+  el.innerHTML =
+    '<button class="back-btn" onclick="goPage(\'produtos-page\')">← Voltar</button>'+
+    '<div class="det-wrap"><div class="det-grid">'+
+    '<div class="det-img-box"><img src="'+p.img+'" alt="'+p.alt+'" loading="lazy"></div>'+
+    '<div class="det-info">'+
+    '<span class="det-badge">'+p.badge+'</span>'+
+    '<h1>'+p.name+'</h1>'+
+    '<div class="det-price">'+p.price+'</div>'+
+    '<hr class="det-hr">'+
+    '<p class="det-desc">'+p.desc+'</p>'+
+    '<ul class="det-feats">'+feats+'</ul>'+
+    '<div class="specs-box"><div class="specs-head">📋 Especificações</div>'+specs+'</div>'+
+    '<div class="det-actions">'+
+    '<a href="https://wa.me/557388108207'+WA+'?text=Ol%C3%A1%2C+quero+comprar%3A+'+p.buy+'" target="_blank" class="btn-wa green">'+waSvg+' Comprar pelo WhatsApp</a>'+
+    '<a href="https://wa.me/557388108207'+WA+'?text=Ol%C3%A1%2C+tenho+d%C3%BAvidas+sobre%3A+'+p.ask+'" target="_blank" class="btn-wa outline">💬 Tirar Dúvidas</a>'+
+    '</div></div></div></div>';
+  document.querySelector('.app').appendChild(el);
+}
+PRODS.forEach(makeDetail);
+</script>
+
+<!-- ══════════════════════════════ ORÇAMENTO ══════════════════════════════ -->
+<div id="orc-page" class="page">
+  <button class="back-btn" onclick="goPage('home-page')">← Voltar</button>
+  <div class="sec-hero">
+    <div class="tag">// Orçamento Grátis</div>
+    <h2 class="sec-title">Solicite seu<br><span style="color:var(--blue)">orçamento agora</span></h2>
+    <p class="sec-sub">Preencha o formulário e receba uma resposta rápida pelo WhatsApp.</p>
+  </div>
+  <div class="sec-wrap">
+    <div class="orc-grid">
+      <div class="orc-info">
+        <h3>Como <span>funciona?</span></h3>
+        <p>Simples e rápido. Você preenche as informações do seu veículo e do problema, e a gente responde pelo WhatsApp com o orçamento.</p>
+        <div class="orc-steps">
+          <div class="orc-step">
+            <div class="orc-step-num">1</div>
+            <div class="orc-step-txt">
+              <strong>Preencha o formulário</strong>
+              <span>Informe seus dados e o problema do veículo</span>
+            </div>
+          </div>
+          <div class="orc-step">
+            <div class="orc-step-num">2</div>
+            <div class="orc-step-txt">
+              <strong>Envie pelo WhatsApp</strong>
+              <span>Clique no botão verde e a mensagem vai direto</span>
+            </div>
+          </div>
+          <div class="orc-step">
+            <div class="orc-step-num">3</div>
+            <div class="orc-step-txt">
+              <strong>Receba o orçamento</strong>
+              <span>Nossa equipe responde rapidamente</span>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-top:4px">
+          <p style="font-size:13px;color:var(--mt);line-height:1.7">📍 <strong style="color:#fff">EstetCar Auto Center</strong><br>Atendimento pelo WhatsApp<br>⏰ Seg–Sáb · Horário comercial</p>
+        </div>
+      </div>
+      <div class="orc-form" id="orcForm">
+        <h3>Solicitar Orçamento</h3>
+        <p>Preencha os campos abaixo</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Seu Nome *</label>
+            <input class="form-input" id="oNome" type="text" placeholder="Ex: João Silva" maxlength="60">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Seu WhatsApp *</label>
+            <input class="form-input" id="oTel" type="tel" placeholder="(00) 00000-0000" maxlength="20">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Placa do Veículo *</label>
+            <input class="form-input" id="oPlaca" type="text" placeholder="Ex: ABC-1234" maxlength="10">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo do Veículo *</label>
+            <input class="form-input" id="oModelo" type="text" placeholder="Ex: Gol 2018" maxlength="40">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descreva o problema *</label>
+          <textarea class="form-textarea" id="oProblema" placeholder="Ex: Carro não está partindo, faz um barulho estranho ao frear, luz do painel acesa..."></textarea>
+        </div>
+        <button class="btn-orc" onclick="enviarOrcamento()">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="white"><path d="M16 0C7.164 0 0 7.164 0 16c0 2.828.736 5.484 2.02 7.78L.076 31.924l8.356-2.192A15.934 15.934 0 0016 32c8.836 0 16-7.164 16-16S24.836 0 16 0zm0 29.336c-2.548 0-4.944-.708-7.004-1.936l-.5-.296-5.18 1.356 1.38-5.04-.328-.52A13.276 13.276 0 012.664 16c0-7.364 5.972-13.336 13.336-13.336S29.336 8.636 29.336 16 23.364 29.336 16 29.336zm7.308-9.988c-.4-.2-2.368-1.168-2.736-1.3-.368-.132-.636-.2-.904.2-.268.4-1.036 1.3-1.268 1.568-.232.268-.468.3-.868.1-.4-.2-1.688-.62-3.216-1.98-1.188-1.056-1.992-2.36-2.224-2.76-.232-.4-.024-.616.176-.816.18-.18.4-.468.6-.7.2-.232.268-.4.4-.668.132-.268.068-.5-.032-.7-.1-.2-.904-2.176-1.24-2.98-.328-.784-.66-.676-.904-.688-.232-.012-.5-.016-.768-.016s-.7.1-1.068.5c-.368.4-1.404 1.372-1.404 3.348s1.436 3.884 1.636 4.152c.2.268 2.828 4.316 6.852 6.052.956.412 1.704.66 2.288.844.96.304 1.836.26 2.528.156.772-.116 2.368-.968 2.7-1.904.332-.936.332-1.74.232-1.904-.1-.164-.368-.264-.768-.464z"/></svg>
+          Enviar Orçamento pelo WhatsApp
+        </button>
+        <p class="form-note">Ao clicar, você será redirecionado para o WhatsApp da EstetCar com sua mensagem pronta. Não compartilhamos seus dados.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ AVALIAÇÕES ══════════════════════════════ -->
+<div id="feed-page" class="page">
+  <button class="back-btn" onclick="goPage('home-page')">← Voltar</button>
+  <div class="sec-hero">
+    <div class="tag">// Avaliações</div>
+    <h2 class="sec-title">O que nossos clientes<br><span style="color:var(--blue)">dizem sobre nós</span></h2>
+    <p class="sec-sub">Satisfação garantida em cada atendimento.</p>
+  </div>
+  <div class="sec-wrap">
+    <div class="feed-grid">
+      <div class="feed-card"><div class="feed-stars">★★★★★</div><p class="feed-text">"Atendimento incrível! Minha bateria chegou rápido e o preço foi ótimo. Recomendo demais a EstetCar!"</p><div class="feed-author"><div class="feed-av">M</div><div><div class="feed-name">Marcos Silva</div><div class="feed-since">Cliente desde 2024</div></div></div></div>
+      <div class="feed-card"><div class="feed-stars">★★★★★</div><p class="feed-text">"Comprei as presilhas e veio tudo certinho. O Vinício tirou todas as minhas dúvidas pelo WhatsApp. Excelente!"</p><div class="feed-author"><div class="feed-av">A</div><div><div class="feed-name">Ana Paula</div><div class="feed-since">Cliente desde 2024</div></div></div></div>
+      <div class="feed-card"><div class="feed-stars">★★★★★</div><p class="feed-text">"Fiz a limpeza de bicos injetores e o carro voltou a render muito melhor. Serviço de qualidade e profissionalismo!"</p><div class="feed-author"><div class="feed-av">R</div><div><div class="feed-name">Roberto Lima</div><div class="feed-since">Cliente desde 2023</div></div></div></div>
+      <div class="feed-card"><div class="feed-stars">★★★★★</div><p class="feed-text">"Produto original, entrega rápida e atendimento humanizado. A EstetCar é referência na região!"</p><div class="feed-author"><div class="feed-av">J</div><div><div class="feed-name">Juliana Costa</div><div class="feed-since">Cliente desde 2024</div></div></div></div>
+      <div class="feed-card"><div class="feed-stars">★★★★★</div><p class="feed-text">"Bateria Onbat chegou no dia seguinte, embalagem perfeita e o preço bem abaixo do mercado. Top demais!"</p><div class="feed-author"><div class="feed-av">F</div><div><div class="feed-name">Felipe Mendes</div><div class="feed-since">Cliente desde 2025</div></div></div></div>
+      <div class="feed-card"><div class="feed-stars">★★★★★</div><p class="feed-text">"Vinício é muito atencioso e honesto. Indicou o produto certo pro meu carro sem empurrar nada errado."</p><div class="feed-author"><div class="feed-av">C</div><div><div class="feed-name">Carla Souza</div><div class="feed-since">Cliente desde 2024</div></div></div></div>
+    </div>
+    <div class="feed-cta">
+      <h3>Já é cliente EstetCar?</h3>
+      <p>Deixe sua avaliação e ajude outros clientes a nos conhecer!</p>
+      <a href="https://wa.me/557388108207?text=Ol%C3%A1%20Vin%C3%ADcio%2C%20quero%20deixar%20minha%20avalia%C3%A7%C3%A3o%20da%20EstetCar!" target="_blank" class="btn-wa green" style="display:inline-flex;width:auto;padding:14px 28px">
+        <svg width="20" height="20" viewBox="0 0 32 32" fill="white"><path d="M16 0C7.164 0 0 7.164 0 16c0 2.828.736 5.484 2.02 7.78L.076 31.924l8.356-2.192A15.934 15.934 0 0016 32c8.836 0 16-7.164 16-16S24.836 0 16 0zm0 29.336c-2.548 0-4.944-.708-7.004-1.936l-.5-.296-5.18 1.356 1.38-5.04-.328-.52A13.276 13.276 0 012.664 16c0-7.364 5.972-13.336 13.336-13.336S29.336 8.636 29.336 16 23.364 29.336 16 29.336zm7.308-9.988c-.4-.2-2.368-1.168-2.736-1.3-.368-.132-.636-.2-.904.2-.268.4-1.036 1.3-1.268 1.568-.232.268-.468.3-.868.1-.4-.2-1.688-.62-3.216-1.98-1.188-1.056-1.992-2.36-2.224-2.76-.232-.4-.024-.616.176-.816.18-.18.4-.468.6-.7.2-.232.268-.4.4-.668.132-.268.068-.5-.032-.7-.1-.2-.904-2.176-1.24-2.98-.328-.784-.66-.676-.904-.688-.232-.012-.5-.016-.768-.016s-.7.1-1.068.5c-.368.4-1.404 1.372-1.404 3.348s1.436 3.884 1.636 4.152c.2.268 2.828 4.316 6.852 6.052.956.412 1.704.66 2.288.844.96.304 1.836.26 2.528.156.772-.116 2.368-.968 2.7-1.904.332-.936.332-1.74.232-1.904-.1-.164-.368-.264-.768-.464z"/></svg>
+        Enviar Avaliação
+      </a>
+    </div>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<script>
+// ── PARTICLES ──
+(function(){
+  var c=document.getElementById('particles'),ctx=c.getContext('2d'),W,H,dots=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<75;i++) dots.push({x:Math.random()*2000,y:Math.random()*2000,r:Math.random()*1.4+.3,sx:(Math.random()-.5)*.22,sy:(Math.random()-.5)*.22,o:Math.random()*.4+.1});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<dots.length;i++){var d=dots[i];d.x+=d.sx;d.y+=d.sy;if(d.x<0)d.x=W;if(d.x>W)d.x=0;if(d.y<0)d.y=H;if(d.y>H)d.y=0;ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);ctx.fillStyle='rgba(0,102,255,'+d.o+')';ctx.fill();}
+    for(var i=0;i<dots.length;i++)for(var j=i+1;j<dots.length;j++){var dx=dots[i].x-dots[j].x,dy=dots[i].y-dots[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<100){ctx.beginPath();ctx.moveTo(dots[i].x,dots[i].y);ctx.lineTo(dots[j].x,dots[j].y);ctx.strokeStyle='rgba(0,102,255,'+(0.06*(1-dist/100))+')';ctx.lineWidth=.5;ctx.stroke();}}
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── NAV ──
+var NAV_IDS = ['home-page','vini-page','servicos-page','produtos-page','orc-page','feed-page'];
+function goPage(id, btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var el=document.getElementById(id);
+  if(el){el.classList.add('active');window.scrollTo(0,0);}
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  if(btn){btn.classList.add('active');}
+  else{var idx=NAV_IDS.indexOf(id);var btns=document.querySelectorAll('.nav-btn');if(idx>=0&&btns[idx])btns[idx].classList.add('active');}
+  siteIdx=null;
+}
+function toggleMenu(){document.getElementById('mobMenu').classList.toggle('open');}
+function closeMenu(){document.getElementById('mobMenu').classList.remove('open');}
+
+
+// Category filter
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-tab').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  var cards = document.querySelectorAll('#prodGrid .prod-card');
+  var found = 0;
+  cards.forEach(function(c){
+    var show = cat === 'todos' || c.getAttribute('data-cat') === cat;
+    c.style.display = show ? '' : 'none';
+    if(show) found++;
+  });
+  document.getElementById('emptyMsg').style.display = found === 0 ? 'block' : 'none';
+  // also clear search
+  var inp = document.getElementById('prodIn');
+  if(inp) inp.value = '';
+}
+
+// ── PRODUCT FILTER ──
+function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function filterProd(val){
+  var q=norm(val);var found=0;
+  document.querySelectorAll('#prodGrid .prod-card').forEach(function(c){
+    var txt=norm((c.getAttribute('data-search')||'')+' '+(c.querySelector('h3')?c.querySelector('h3').textContent:''));
+    var show=!q||txt.includes(q);c.style.display=show?'':'none';if(show)found++;
+  });
+  document.getElementById('emptyMsg').style.display=found===0?'block':'none';
+}
+
+// ── LIVE SEARCH ──
+var siteIdx=null;
+function buildIdx(){
+  if(siteIdx)return;siteIdx=[];
+  document.querySelectorAll('.service-card').forEach(function(card){
+    var t=card.querySelector('h3')?card.querySelector('h3').textContent.trim():'';
+    var d=card.querySelector('p')?card.querySelector('p').textContent.trim():'';
+    var a=card.querySelector('a')?card.querySelector('a').getAttribute('href'):'';
+    siteIdx.push({tipo:'Serviço',icon:'🔧',title:t,desc:d,waLink:a,page:'servicos-page'});
+  });
+  document.querySelectorAll('#prodGrid .prod-card').forEach(function(card){
+    var t=card.querySelector('h3')?card.querySelector('h3').textContent.trim():'';
+    var d=card.querySelector('p')?card.querySelector('p').textContent.trim():'';
+    var pr=card.querySelector('.prod-price')?card.querySelector('.prod-price').textContent.trim():'';
+    var s=card.getAttribute('data-search')||'';
+    var pg=card.getAttribute('onclick')||'produtos-page';
+    pg=pg.replace(/goPage\('([^']+)'\)/,'$1');
+    siteIdx.push({tipo:'Produto',icon:'🛍️',title:t,desc:d,price:pr,page:pg,search:s});
+  });
+}
+function liveSearch(val){
+  var drop=document.getElementById('heroDrop');
+  if(!drop)return;
+  if(!val||val.trim().length<2){drop.style.display='none';drop.innerHTML='';return;}
+  buildIdx();
+  var q=norm(val.trim());
+  var hits=siteIdx.filter(function(r){return norm(r.title+' '+r.desc+' '+(r.search||'')).includes(q);});
+  if(hits.length===0){
+    drop.innerHTML='<div style="padding:14px 18px;color:#444;font-size:14px;">Nenhum resultado encontrado</div>';
+  }else{
+    drop.innerHTML=hits.map(function(r){
+      var isSvc=r.tipo==='Serviço';
+      var act=isSvc?'servicos-page':r.page;
+      return '<div class="drop-item" onclick="closeDrop();goPage(\''+act+'\')">'
+        +'<span class="drop-icon">'+r.icon+'</span>'
+        +'<div class="drop-body">'
+        +'<div class="drop-meta"><span class="drop-badge '+(isSvc?'svc':'prd')+'">'+r.tipo.toUpperCase()+'</span>'+(r.price?'<span class="drop-price">'+r.price+'</span>':'')+'</div>'
+        +'<div class="drop-title">'+r.title+'</div>'
+        +'<div class="drop-desc">'+r.desc+'</div>'
+        +'</div></div>';
+    }).join('');
+  }
+  drop.style.display='block';
+}
+function closeDrop(){
+  var d=document.getElementById('heroDrop');if(d){d.style.display='none';d.innerHTML='';}
+  var i=document.getElementById('homeIn');if(i)i.value='';
+}
+document.addEventListener('click',function(e){var w=document.querySelector('.hero-search');if(w&&!w.contains(e.target))closeDrop();});
+
+// ── ORÇAMENTO ──
+function enviarOrcamento(){
+  var nome=document.getElementById('oNome').value.trim();
+  var tel=document.getElementById('oTel').value.trim();
+  var placa=document.getElementById('oPlaca').value.trim();
+  var modelo=document.getElementById('oModelo').value.trim();
+  var problema=document.getElementById('oProblema').value.trim();
+  if(!nome||!tel||!placa||!modelo||!problema){
+    alert('Por favor, preencha todos os campos antes de enviar.');return;
+  }
+  var msg='🚗 *SOLICITAÇÃO DE ORÇAMENTO — ESTETCAR*\n\n'
+    +'👤 *Nome:* '+nome+'\n'
+    +'📱 *WhatsApp:* '+tel+'\n'
+    +'🔑 *Placa:* '+placa.toUpperCase()+'\n'
+    +'🚙 *Veículo:* '+modelo+'\n\n'
+    +'🔧 *Problema / Serviço desejado:*\n'+problema+'\n\n'
+    +'_Mensagem enviada pelo site EstetCar_';
+  var url='https://wa.me/557388108207'+WA+'?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+// ── INJECT VINI PHOTO ──
+(function(){
+  var img = document.getElementById('viniPhoto');
+  if(img) img.src = 'https://a.lovart.ai/artifacts/user/GqQ0cGZomL6mc2UA.png';
+  // Will be replaced when real photo URL is available
+})();
+</script>
+</body>
+</html>
